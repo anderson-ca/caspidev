@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Head from "next/head";
 import ReservationForm from "../components/ReservationForm";
 import RestaurantList from "../components/RestaurantList";
+
 import restaurants from "../data/restaurantData";
 
 export default function Home() {
