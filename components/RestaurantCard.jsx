@@ -2,7 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
-const RestaurantCard = ({ restaurant, index }) => {
+const RestaurantCard = ({ restaurant, index, isCompact = false, isMobile = false }) => {
   const router = useRouter();
 
   // Function to render stars based on rating
@@ -47,18 +47,191 @@ const RestaurantCard = ({ restaurant, index }) => {
     (slot) => slot.available
   );
 
-  // Navigate to restaurant detail page
-  const handleRestaurantClick = () => {
-    router.push(`/restaurant/${restaurant.id}`);
-  };
+  // Mobile card (stacked full-width view)
+  if (isMobile) {
+    return (
+      <div className="border-b border-gray-200 pb-4">
+        <div className="flex flex-col">
+          {/* Restaurant image */}
+          <div 
+            className="w-full h-48 cursor-pointer mb-3"
+            onClick={() => router.push(`/restaurant/${restaurant.id}`)}
+          >
+            <img
+              src={restaurant.image}
+              alt={restaurant.name}
+              className="w-full h-full object-cover rounded"
+            />
+          </div>
 
+          {/* Restaurant details */}
+          <div>
+            {/* Restaurant name & rating */}
+            <div className="flex justify-between items-start">
+              <h3
+                className="text-lg font-medium text-blue-600 mb-1 cursor-pointer"
+                onClick={() => router.push(`/restaurant/${restaurant.id}`)}
+              >
+                {index + 1}. {restaurant.name}
+              </h3>
+              <div className="flex items-center space-x-1 text-sm">
+                <span className="text-sm">{renderStars(restaurant.rating)}</span>
+                <span className="text-gray-500">({restaurant.reviewCount})</span>
+              </div>
+            </div>
+
+            {/* Price and cuisine */}
+            <div className="mb-2 text-sm text-gray-600">
+              <span>{restaurant.priceRange}</span>
+              <span className="mx-1">•</span>
+              <span>{restaurant.cuisineType}</span>
+              {restaurant.neighborhood && (
+                <>
+                  <span className="mx-1">•</span>
+                  <span>{restaurant.neighborhood}</span>
+                </>
+              )}
+            </div>
+
+            {/* Booking information */}
+            <div className="flex items-center text-xs mb-2 text-gray-600">
+              <svg className="w-4 h-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"></path>
+              </svg>
+              <span>
+                Booked {restaurant.bookingCount} times today
+              </span>
+            </div>
+
+            {/* Available time slots */}
+            <div className="flex flex-wrap gap-1">
+              {availableTimeslots.slice(0, 3).map((slot, i) => (
+                <button
+                  key={i}
+                  className="bg-red-500 text-white text-sm px-2 py-1 rounded-md"
+                  onClick={() => router.push({
+                    pathname: `/reservation/${restaurant.id}`,
+                    query: {
+                      date: '2025-03-26',
+                      time: slot.time,
+                      party: 2
+                    }
+                  })}
+                >
+                  {slot.time}
+                </button>
+              ))}
+              {availableTimeslots.length > 3 && (
+                <button className="bg-red-500 text-white text-sm px-2 py-1 rounded-md">
+                  +{availableTimeslots.length - 3}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (isCompact) {
+    // Compact card view for horizontal scrolling on desktop
+    return (
+      <div className="bg-white rounded-lg h-full shadow-sm hover:shadow-md transition-shadow duration-200">
+        {/* Restaurant image */}
+        <div 
+          className="w-full h-40 cursor-pointer overflow-hidden"
+          onClick={() => router.push(`/restaurant/${restaurant.id}`)}
+        >
+          <img
+            src={restaurant.image}
+            alt={restaurant.name}
+            className="w-full h-full object-cover rounded-t-lg hover:opacity-90 transition"
+          />
+        </div>
+
+        {/* Restaurant details */}
+        <div className="p-3">
+          {/* Restaurant name */}
+          <h3
+            className="text-lg font-medium text-gray-900 mb-1 cursor-pointer hover:text-red-500 truncate"
+            onClick={() => router.push(`/restaurant/${restaurant.id}`)}
+          >
+            {restaurant.name}
+          </h3>
+
+          {/* Rating */}
+          <div className="flex items-center mb-1">
+            <div className="text-sm mr-2">{renderStars(restaurant.rating)}</div>
+            <span className="text-sm text-gray-500">
+              {restaurant.reviewCount} reviews
+            </span>
+          </div>
+
+          {/* Price and cuisine */}
+          <div className="mb-2 text-sm text-gray-700">
+            <span>{restaurant.cuisineType}</span>
+            <span className="mx-2">•</span>
+            <span>{restaurant.priceRange}</span>
+            {restaurant.neighborhood && (
+              <>
+                <span className="mx-2">•</span>
+                <span>{restaurant.neighborhood}</span>
+              </>
+            )}
+          </div>
+
+          {/* Booking information */}
+          <div className="flex items-center text-xs mb-2 text-gray-700">
+            <svg className="w-4 h-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"></path>
+            </svg>
+            <span>
+              Booked {restaurant.bookingCount} times today
+            </span>
+          </div>
+
+          {/* Available time slots */}
+          <div className="flex flex-wrap gap-1">
+            {availableTimeslots.slice(0, 2).map((slot, i) => (
+              <button
+                key={i}
+                className="bg-red-500 text-white text-sm px-3 py-1 rounded font-medium hover:bg-red-600 transition"
+                onClick={() => router.push({
+                  pathname: `/reservation/${restaurant.id}`,
+                  query: {
+                    date: '2025-03-26',
+                    time: slot.time,
+                    party: 2
+                  }
+                })}
+              >
+                {slot.time}
+              </button>
+            ))}
+            {availableTimeslots.length > 2 && (
+              <button className="bg-red-500 text-white text-sm px-2 py-1 rounded font-medium hover:bg-red-600 transition">
+                +{availableTimeslots.length - 2}
+              </button>
+            )}
+          </div>
+
+          {/* Points indicator */}
+          <div className="flex items-center mt-3 text-xs text-red-500">
+            +1,000 pts
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Regular full-width card view for list page
   return (
-    <div className="py-6 border-b border-gray-200">
+    <div className="border-b border-gray-200 pb-6 pt-6 md:border md:rounded-lg md:p-4 md:hover:shadow-md transition-shadow duration-200 bg-white">
       <div className="flex flex-col md:flex-row">
-        {/* Restaurant image (clickable) */}
-        <div
-          className="md:w-1/4 h-40 md:h-auto mr-0 md:mr-4 mb-4 md:mb-0 cursor-pointer"
-          onClick={handleRestaurantClick}
+        {/* Restaurant image - desktop: side by side, mobile: stacked */}
+        <div 
+          className="w-full md:w-40 h-48 md:h-32 mb-4 md:mb-0 md:mr-4 cursor-pointer overflow-hidden"
+          onClick={() => router.push(`/restaurant/${restaurant.id}`)}
         >
           <img
             src={restaurant.image}
@@ -68,13 +241,13 @@ const RestaurantCard = ({ restaurant, index }) => {
         </div>
 
         {/* Restaurant details */}
-        <div className="md:w-3/4">
-          {/* Restaurant name (clickable) */}
+        <div className="flex-1">
+          {/* Restaurant name */}
           <h3
             className="text-xl font-medium text-blue-600 mb-1 cursor-pointer hover:underline"
-            onClick={handleRestaurantClick}
+            onClick={() => router.push(`/restaurant/${restaurant.id}`)}
           >
-            {index + 1}. {restaurant.name}
+            {restaurant.name}
           </h3>
 
           {/* Rating */}
@@ -91,6 +264,12 @@ const RestaurantCard = ({ restaurant, index }) => {
             <span className="font-medium">{restaurant.priceRange}</span>
             <span className="mx-2">•</span>
             <span>{restaurant.cuisineType}</span>
+            {restaurant.neighborhood && (
+              <>
+                <span className="mx-2">•</span>
+                <span>{restaurant.neighborhood}</span>
+              </>
+            )}
           </div>
 
           {/* Booking information */}
@@ -128,31 +307,32 @@ const RestaurantCard = ({ restaurant, index }) => {
             </span>
           </div>
 
-          {/* Available time slots */}
-          <div className="flex flex-wrap mb-4 gap-2">
-            {restaurant.availableTimeslots.map(
-              (slot, i) =>
-                slot.available && (
-                  <button
-                    key={i}
-                    className="bg-red-500 text-white px-4 py-2 rounded font-medium hover:bg-red-600 transition"
-                    onClick={() => router.push({
-                        pathname: `/reservation/${restaurant.id}`,
-                        query: {
-                          date: '2025-03-26', // You can format this dynamically from a date state
-                          time: slot.time,
-                          party: 2
-                        }
-                      })}
-                  >
-                    {slot.time}*
-                  </button>
-                )
-            )}
+          {/* Available time slots - mobile: wrap, desktop: flex-row */}
+          <div className="flex flex-wrap gap-2">
+            {availableTimeslots.slice(0, 4).map((slot, i) => (
+              <button
+                key={i}
+                className="bg-red-500 text-white px-4 py-2 rounded-md font-medium hover:bg-red-600 transition"
+                onClick={() => router.push({
+                  pathname: `/reservation/${restaurant.id}`,
+                  query: {
+                    date: '2025-03-26',
+                    time: slot.time,
+                    party: 2
+                  }
+                })}
+              >
+                {slot.time}{availableTimeslots.length > 4 && i === 3 ? "+" : ""}
+              </button>
+            ))}
           </div>
 
-          {/* Review text */}
-          <p className="text-gray-700">{restaurant.reviewText}</p>
+          {/* Points indicator for desktop */}
+          <div className="hidden md:flex items-center mt-3 text-sm text-gray-500">
+            <div className="bg-gray-100 px-2 py-1 rounded">
+              +1,000 pts
+            </div>
+          </div>
         </div>
       </div>
     </div>
