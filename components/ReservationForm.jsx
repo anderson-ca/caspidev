@@ -2,12 +2,11 @@ import React, { useState } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 
-const ReservationForm = ({ initialValues, onSubmit }) => {
+const ReservationForm = ({ initialValues, onSubmit, onSearchInputChange, searchQuery }) => {
   const [showCalendar, setShowCalendar] = useState(false);
   const [date, setDate] = useState(initialValues?.date || new Date());
   const [time, setTime] = useState(initialValues?.time || "7:00 PM");
   const [partySize, setPartySize] = useState(initialValues?.partySize || 2);
-  const [searchQuery, setSearchQuery] = useState("");
   
   // Time slots available for reservation
   const timeSlots = [
@@ -26,6 +25,15 @@ const ReservationForm = ({ initialValues, onSubmit }) => {
     onSubmit({ date, time, partySize, searchQuery });
   };
   
+  // Handle real-time search input changes
+  const handleSearchChange = (e) => {
+    const query = e.target.value;
+    // Call the parent's handler to update the search query
+    if (onSearchInputChange) {
+      onSearchInputChange(query);
+    }
+  };
+  
   return (
     <form onSubmit={handleSubmit} className="w-full max-w-5xl">
       {/* Mobile stacked view */}
@@ -36,12 +44,12 @@ const ReservationForm = ({ initialValues, onSubmit }) => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
             </svg>
             <div 
-              className="flex-1 cursor-pointer"
+              className="flex-1 cursor-pointer text-gray-800 font-medium"
               onClick={() => setShowCalendar(true)}
             >
               {formatDate(date)}
             </div>
-            <svg className="w-5 h-5 text-gray-400 flex-shrink-0" onClick={() => setShowCalendar(true)} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-gray-500 flex-shrink-0" onClick={() => setShowCalendar(true)} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
             </svg>
           </div>
@@ -53,7 +61,7 @@ const ReservationForm = ({ initialValues, onSubmit }) => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
             <select
-              className="appearance-none bg-transparent border-none w-full focus:outline-none pr-8"
+              className="appearance-none bg-transparent border-none w-full focus:outline-none pr-8 text-gray-800 font-medium"
               value={time}
               onChange={(e) => setTime(e.target.value)}
             >
@@ -61,7 +69,7 @@ const ReservationForm = ({ initialValues, onSubmit }) => {
                 <option key={slot} value={slot}>{slot}</option>
               ))}
             </select>
-            <svg className="w-5 h-5 text-gray-400 absolute right-3 pointer-events-none flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-gray-500 absolute right-3 pointer-events-none flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
             </svg>
           </div>
@@ -73,7 +81,7 @@ const ReservationForm = ({ initialValues, onSubmit }) => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
             </svg>
             <select
-              className="appearance-none bg-transparent border-none w-full focus:outline-none pr-8"
+              className="appearance-none bg-transparent border-none w-full focus:outline-none pr-8 text-gray-800 font-medium"
               value={partySize}
               onChange={(e) => setPartySize(parseInt(e.target.value))}
             >
@@ -83,7 +91,7 @@ const ReservationForm = ({ initialValues, onSubmit }) => {
                 </option>
               ))}
             </select>
-            <svg className="w-5 h-5 text-gray-400 absolute right-3 pointer-events-none flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-gray-500 absolute right-3 pointer-events-none flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
             </svg>
           </div>
@@ -97,16 +105,16 @@ const ReservationForm = ({ initialValues, onSubmit }) => {
             <input
               type="text"
               placeholder="Location, Restaurant, or Cuisine"
-              className="w-full border-none focus:outline-none"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full border-none focus:outline-none text-gray-800"
+              value={searchQuery || ""}
+              onChange={handleSearchChange}
             />
           </div>
         </div>
         
         <button
           type="submit"
-          className="w-full bg-red-500 hover:bg-red-600 text-white font-medium py-3 rounded-md transition duration-200"
+          className="w-full bg-gray-900 hover:bg-gray-600 text-white font-medium py-3 rounded-md transition duration-200 border-2 border-red-500"
         >
           Let's go
         </button>
@@ -124,9 +132,9 @@ const ReservationForm = ({ initialValues, onSubmit }) => {
               <svg className="w-5 h-5 text-gray-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
               </svg>
-              <span className="whitespace-nowrap">{formatDate(date)}</span>
+              <span className="whitespace-nowrap text-gray-800 font-medium">{formatDate(date)}</span>
             </div>
-            <svg className="w-5 h-5 text-gray-400 ml-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-gray-500 ml-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
             </svg>
           </div>
@@ -140,7 +148,7 @@ const ReservationForm = ({ initialValues, onSubmit }) => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
               <select
-                className="appearance-none bg-transparent border-none w-full focus:outline-none pr-8"
+                className="appearance-none bg-transparent border-none w-full focus:outline-none pr-8 text-gray-800 font-medium"
                 value={time}
                 onChange={(e) => setTime(e.target.value)}
               >
@@ -148,7 +156,7 @@ const ReservationForm = ({ initialValues, onSubmit }) => {
                   <option key={slot} value={slot}>{slot}</option>
                 ))}
               </select>
-              <svg className="w-5 h-5 text-gray-400 absolute right-3 pointer-events-none flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-gray-500 absolute right-3 pointer-events-none flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
               </svg>
             </div>
@@ -163,7 +171,7 @@ const ReservationForm = ({ initialValues, onSubmit }) => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
               </svg>
               <select
-                className="appearance-none bg-transparent border-none w-full focus:outline-none pr-8"
+                className="appearance-none bg-transparent border-none w-full focus:outline-none pr-8 text-gray-800 font-medium"
                 value={partySize}
                 onChange={(e) => setPartySize(parseInt(e.target.value))}
               >
@@ -173,7 +181,7 @@ const ReservationForm = ({ initialValues, onSubmit }) => {
                   </option>
                 ))}
               </select>
-              <svg className="w-5 h-5 text-gray-400 absolute right-3 pointer-events-none flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-gray-500 absolute right-3 pointer-events-none flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
               </svg>
             </div>
@@ -190,9 +198,9 @@ const ReservationForm = ({ initialValues, onSubmit }) => {
               <input
                 type="text"
                 placeholder="Location, Restaurant, or Cuisine"
-                className="w-full h-full border-none focus:outline-none"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full h-full border-none focus:outline-none text-gray-800"
+                value={searchQuery || ""}
+                onChange={handleSearchChange}
               />
             </div>
           </div>
@@ -202,7 +210,7 @@ const ReservationForm = ({ initialValues, onSubmit }) => {
         <div className="md:w-32 h-full">
           <button
             type="submit"
-            className="w-full h-full bg-red-500 hover:bg-red-600 text-white font-medium px-4 rounded-r-md transition duration-200"
+            className="w-full h-full bg-gray-900 hover:bg-gray-600 text-white font-medium px-4 rounded-r-md transition duration-200"
           >
             Let's go
           </button>
@@ -214,6 +222,17 @@ const ReservationForm = ({ initialValues, onSubmit }) => {
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black bg-opacity-30" onClick={() => setShowCalendar(false)}></div>
           <div className="relative z-10 bg-white rounded-lg shadow-lg">
+            <div className="p-2 flex justify-between items-center border-b">
+              <h3 className="text-lg font-medium">Select Date</h3>
+              <button 
+                onClick={() => setShowCalendar(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd"></path>
+                </svg>
+              </button>
+            </div>
             <Calendar
               onChange={(newDate) => {
                 setDate(newDate);
@@ -221,6 +240,7 @@ const ReservationForm = ({ initialValues, onSubmit }) => {
               }}
               value={date}
               minDate={new Date()}
+              className="custom-calendar" // Added for potential custom styling
             />
           </div>
         </div>
